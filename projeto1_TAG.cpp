@@ -1,47 +1,156 @@
+/*
+  Projeto 1 da discplina CIC0199 - Teoria e Aplicacao de Grafos
+  Nome: Maria Eduarda Carvalho Santos
+  Matricula: 190092556
+  UnB, Darcy Ribeiro - 2022.2
+*/
+
 #include<bits/stdc++.h>
 
 using namespace std;
 
-vector<pair<string, vector<string>>> adj;
+vector<vector<string>> grafo;
+vector<vector<string>> cliques;
+
+void print(vector<string> v)
+{
+  for(int i=0; i<v.size(); i++)
+  {
+    cout << v[i] << " ";
+  }
+
+  cout << endl;
+}
 
 void print()
 {
-    for(int i=0; i<adj.size(); i++)
+    for(int i=0; i<grafo.size(); i++)
     {
-        cout << adj[i].first << ": \n";
+        //cout << grafo[i][0] << ": \n";
 
-        for(int j=0; j<adj[i].second.size(); j++)
+        for(int j=0; j<grafo[i].size(); j++)
         {
-            cout << *(adj[i].second.begin()+j) << " ";
+            cout << grafo[i][j] << " -> ";
         }
 
         cout << endl;
     }
 }
 
+double coeficienteDeAglomeracao()
+{
+  double ans = 0;
+
+  for(int v=1; v<=grafo.size(); v++)    //talvez tenha um erro nesse grafo.size() aqui
+  {
+    double coeficienteLocal = 0;
+
+    for(auto vizinho : grafo[v])
+    {
+      for(auto outroVizinho : grafo[vizinho])
+      {
+        for(auto u : grafo[v])
+        {
+          if(outroVizinho == u)
+          {
+            coeficienteLocal++;
+          }
+        }
+      }
+    }
+
+    if(grafo[v].size()>1)
+    {
+      ans += (double)coeficienteLocal/(grafo[v].size()*(grafo[v].size()-1));
+    }
+  }
+
+  return (double)ans/grafo.size();
+}
+
+vector<string> uniao(vector<string> A, vector<string> B)
+{
+  vector<string> U(A.size()+B.size());
+
+  auto it = set_union(A.begin(), A.end(), B.begin(), B.end(), U.begin());
+
+  U.resize(it- U.begin());
+
+  return U;
+}
+
+vector<string> interseccao(vector<string> A, vector<string> B)
+{
+  vector<string> I(A.size()+B.size());
+
+  auto it = set_union(A.begin(), A.end(), B.begin(), B.end(), I.begin());
+
+  I.resize(it- I.begin());
+
+  return I;
+}
+
+void bronKerboschSemPivot(vector<string> R, vector<string> P, vector<string> X)
+{
+    vector<string> PCopy(P);
+
+    if(P.empty() && X.empty())
+    {
+      cliques.push_back(R);
+    }
+
+    for(auto v: P)
+    {
+      bronKerboschSemPivot(uniao(R, {v}), interseccao(PCopy, grafo[v]), interseccao(X, grafo[v]));
+
+      PCopy.erase(find(PCopy.begin(), PCopy.end(), v));
+      X = uniao(X, {v});
+    }
+}
+
 int main()
 {
-    string s; string dotcomma = ";";
-    vector<string> aux;                                 //vector auxiliar na leitura da entrada
+    //freopen("entrada.txt", "r", stdin);
+    
+    string s;
+    vector<string> aux;                                                                       //vector auxiliar na leitura da entrada
+    vector<string> P; vector<string> R; vector<string> X;
 
     while(cin >> s)
     {
-        // cout << s << endl;
+        string edge = s;                                                                      //variavel auxiliar para insercao de dados limpos no grafo
+        edge.pop_back();                                                                      //limpeza do dado
+        aux.push_back(edge);                                                                  //insercao do dado no vector auxiliar
 
-        string edge = s;                                //variavel auxiliar para insercao de dados limpos no grafo
-        edge.pop_back();                                //limpeza do dado
-        aux.push_back(edge);                            //insercao do dado no vector auxiliar
-
-        if(s.find(";")!=-1)                             //como o metodo find retorna -1 caso o caractere nao seja encontrado, a condicional abaixo sera executada quando ";" estiver em alguma posicao da string s 
+        if(s.find(";")!=-1)                              
         {
-            string node = aux[0];                       //caracterizacao da chave do vetor de adjacencias
-            aux.erase(aux.begin());                     //remocao da chave no vector auxiliar
-            adj.push_back(make_pair(node, aux));        //criacao das conexoes na lista de adjacencia
-            aux.clear();                                //limpeza do vector auxiliar para iniciar a nova conexao
+            P.push_back(aux[0]);
+            grafo.push_back(aux);                                                            //insercao das grafoacencias na lista dinamica que uso como grafo
+            aux.clear();                                                                     //limpando o vetor auxiliar para usar na proxima lista de grafoacencia
         }
     }
 
-    
+    bronKerboschSemPivot(R, P, X);                                                           //implementacao do algortimo de Bron-Kerbosch
+
+    int maior = -1;
+    for(int i=0; i<cliques.size(); i++)                                                     //apresentando os cliques maximais acima de 3 vertices
+    {
+      if(cliques[i].size()>3)
+      {
+        //printa o clique
+
+        if(cliques[i].size()>maior)
+        {
+          maior = i;                                                                       //encontrando o clique maximo
+        }
+      }
+    }
+
+    vector<string> maximal = cliques[maior];
+
+    print(maximal);                                                                       //apresentando o clique maximo
+
+    printf("O coeficiente medio de aglomeracao eh ", coeficienteDeAglomeracao());         //apresentando o coeficiente medio de aglomeracao
 
     return 0;
 }
