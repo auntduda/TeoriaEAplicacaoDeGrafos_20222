@@ -13,7 +13,7 @@ vector<vector<string>> grafo;
 vector<vector<string>> cliques;
 
 void print(vector<string> v)
-{
+{  
   for(int i=0; i<v.size(); i++)
   {
     cout << v[i] << " ";
@@ -47,7 +47,7 @@ double coeficienteDeAglomeracao()
 
     for(auto vizinho : grafo[v])
     {
-      for(auto outroVizinho : grafo[vizinho])
+      for(auto outroVizinho : grafo[find(grafo.begin(), grafo.end(), vizinho)-grafo.begin()+1])
       {
         for(auto u : grafo[v])
         {
@@ -101,7 +101,7 @@ void bronKerboschSemPivot(vector<string> R, vector<string> P, vector<string> X)
 
     for(auto v: P)
     {
-      bronKerboschSemPivot(uniao(R, {v}), interseccao(PCopy, grafo[v]), interseccao(X, grafo[v]));
+      bronKerboschSemPivot(uniao(R, {v}), interseccao(PCopy, grafo[find(grafo.begin(), grafo.end(), v)-grafo.begin()+1]), interseccao(X, grafo[find(grafo.begin(), grafo.end(), v)-grafo.begin()+1]));
 
       PCopy.erase(find(PCopy.begin(), PCopy.end(), v));
       X = uniao(X, {v});
@@ -137,7 +137,8 @@ int main()
     {
       if(cliques[i].size()>3)
       {
-        //printa o clique
+        cout << "o clique maximal eh\n";
+        print(cliques[i]);
 
         if(cliques[i].size()>maior)
         {
@@ -146,11 +147,11 @@ int main()
       }
     }
 
-    vector<string> maximal = cliques[maior];
+    vector<string> maximo = cliques[maior];
 
-    print(maximal);                                                                       //apresentando o clique maximo
+    cout << "o clique maximo eh\n"; print(maximo);                                                                       //apresentando o clique maximo
 
-    printf("O coeficiente medio de aglomeracao eh ", coeficienteDeAglomeracao());         //apresentando o coeficiente medio de aglomeracao
+    printf("O coeficiente medio de aglomeracao eh %.2lf\n", coeficienteDeAglomeracao());         //apresentando o coeficiente medio de aglomeracao
 
     return 0;
 }
