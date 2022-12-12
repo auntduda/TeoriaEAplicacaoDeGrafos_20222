@@ -56,7 +56,18 @@ double coeficienteDeAglomeracao()
     for(auto vizinho : grafo[v])
     {
       //percorrendo todos os vizinhos dos vizinhos do vertice da primiera iteracao
-      for(auto outroVizinho : grafo[find(grafo.begin(), grafo.end(), vizinho)-grafo.begin()+1])
+      int elem;
+      for(int i=0; i<grafo.size(); i++)
+      {
+        //buscando pelo vertice do grafo porque tentei fazer com chave-valor antes mas nao deu muito certo, entao apelei pra fazer com lista de lista e me lasquei
+        if(grafo[i][0].compare(vizinho))
+        {
+          elem = i;
+          break;
+        }
+      }
+
+      for(auto outroVizinho : grafo[elem])
       {
         for(auto u : grafo[v])
         {
@@ -113,8 +124,19 @@ void bronKerboschSemPivot(vector<string> R, vector<string> P, vector<string> X) 
 
     for(auto v: P)                                                                            // analisando cada no do grafo,
     {
-                                                                                              //busque recursivamente as ligacoes entre os nos do grafo, a fim de averiguar se todos os nos possuem adjacencia entre si
-      bronKerboschSemPivot(uniao(R, {v}), interseccao(PCopy, grafo[find(grafo.begin(), grafo.end(), v)-grafo.begin()+1]), interseccao(X, grafo[find(grafo.begin(), grafo.end(), v)-grafo.begin()+1]));
+      //buscando pelo vertice do grafo porque tentei fazer com chave-valor antes mas nao deu muito certo, entao apelei pra fazer com lista de lista e me lasquei
+      int elem;
+      for(int i=0; i<grafo.size(); i++)
+      {
+        if(grafo[i][0].compare(v))
+        {
+          elem = i;
+          break;
+        }
+      }
+
+      //busque recursivamente as ligacoes entre os nos do grafo, a fim de averiguar se todos os nos possuem adjacencia entre si
+      bronKerboschSemPivot(uniao(R, {v}), interseccao(PCopy, grafo[elem]), interseccao(X, grafo[elem]));
 
       PCopy.erase(find(PCopy.begin(), PCopy.end(), v));                                       //apague o no analisado na iteracao da lista de nos a serem analisados
       X = uniao(X, {v});                                                                      // caracterize o conjunto de vertices analisados que nao extendem o clique como a uniao entre o conjunto e o vertice analisado na iteracao
