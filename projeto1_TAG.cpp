@@ -47,6 +47,7 @@ void print()
     }
 }
 
+//funcao para calcular o coeficiente medio de aglomeracao
 double coeficienteDeAglomeracao()
 {
   double ans = 0;
@@ -116,7 +117,8 @@ vector<string> interseccao(vector<string> A, vector<string> B)
   return I;                                                                               //retorna a resposta como uma lista de nos que sao a interseccao
 }
 
-void bronKerboschSemPivot(vector<string> R, vector<string> P, vector<string> X) //algoritmo de identificacao de cliques em um grafo nao direcionado e sem pesos
+//algoritmo de identificacao de cliques em um grafo nao direcionado e sem pesos
+void bronKerboschSemPivot(vector<string> R, vector<string> P, vector<string> X)
 {
     vector<string> PCopy(P);                                                                  //vetor copia de P utilizado para evitar perder o conteudo do vetor P ao longo da recursividade
 
@@ -151,7 +153,7 @@ void bronKerboschSemPivot(vector<string> R, vector<string> P, vector<string> X) 
 
 int main()
 {
-    //freopen("entrada.txt", "r", stdin);
+    freopen("entrada.txt", "r", stdin);                                                       //leitura do arquivo
     
     string s;
     vector<string> aux;                                                                       //vector auxiliar na leitura da entrada
