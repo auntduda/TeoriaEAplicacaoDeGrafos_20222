@@ -6,6 +6,10 @@
 
   #####################################################################################################
 
+  Este programa nao consegue ser executado porque existe algum enderecamento de memoria feito de maneira inccorreta,
+  que me impede de executar o algoritmo de maneira correta. Isso, obviamente, tem a ver com o fato de que deixei para
+  realizar o trabalho de ultima hora, alem de n fatores que me impediram de comecar essa atividade mais cedo. Este recado
+  eh mais um aviso ao leitor (professor Dibio) e um lembrete para a Maria Eduarda do futuro.
 
 */
 
