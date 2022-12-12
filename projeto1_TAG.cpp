@@ -3,15 +3,20 @@
   Nome: Maria Eduarda Carvalho Santos
   Matricula: 190092556
   UnB, Darcy Ribeiro - 2022.2
+
+  #####################################################################################################
+
+
 */
 
 #include<bits/stdc++.h>
 
 using namespace std;
 
-vector<vector<string>> grafo;
-vector<vector<string>> cliques;
+vector<vector<string>> grafo;                                               //lista de adjacencia que caracteriza o grafo
+vector<vector<string>> cliques;                                             //lista de cliques contidos no grafo
 
+//funcao utilizada para mostrar a lista de cliques e listas auxiliares - funcao de debug
 void print(vector<string> v)
 {  
   for(int i=0; i<v.size(); i++)
@@ -22,6 +27,7 @@ void print(vector<string> v)
   cout << endl;
 }
 
+//funcao utilizada para apresentar o grafo na tela
 void print()
 {
     for(int i=0; i<grafo.size(); i++)
@@ -41,17 +47,20 @@ double coeficienteDeAglomeracao()
 {
   double ans = 0;
 
+  //percorrendo todos os vertices do grafo
   for(int v=1; v<=grafo.size(); v++)    //talvez tenha um erro nesse grafo.size() aqui
   {
     double coeficienteLocal = 0;
 
+    //percorrendo todos os vizinhos do vertice
     for(auto vizinho : grafo[v])
     {
+      //percorrendo todos os vizinhos dos vizinhos do vertice da primiera iteracao
       for(auto outroVizinho : grafo[find(grafo.begin(), grafo.end(), vizinho)-grafo.begin()+1])
       {
         for(auto u : grafo[v])
         {
-          if(outroVizinho == u)
+          if(outroVizinho == u)                                                     //se o vizinho do vizinho for vizinho do vertice analisado na iteracao, adicione +1 a resposta
           {
             coeficienteLocal++;
           }
@@ -59,53 +68,59 @@ double coeficienteDeAglomeracao()
       }
     }
 
-    if(grafo[v].size()>1)
+    if(grafo[v].size()>1)                                                           // se o vertice tiver mais de um vizinho, eh necessario recalcular o coeficiente de aglomeracao
     {
       ans += (double)coeficienteLocal/(grafo[v].size()*(grafo[v].size()-1));
     }
   }
 
-  return (double)ans/grafo.size();
+  return (double)ans/grafo.size();                                                //retorna a soma total dos coeficientes de cada vertice e divide pela quantidade de vertices
 }
 
+//funcao que une dois conjuntos
 vector<string> uniao(vector<string> A, vector<string> B)
 {
-  vector<string> U(A.size()+B.size());
+  vector<string> U(A.size()+B.size());                                            // armazena a uniao entre os conjuntos - as listas
 
-  auto it = set_union(A.begin(), A.end(), B.begin(), B.end(), U.begin());
+  auto it = set_union(A.begin(), A.end(), B.begin(), B.end(), U.begin());         //une os dois conjuntos
 
   U.resize(it- U.begin());
 
-  return U;
+  return U;                                                                       //retorna a resposta como uma lista de nos que sao a uniao
 }
 
+//funcao que calcula a interseccao entre dois conjuntos
 vector<string> interseccao(vector<string> A, vector<string> B)
 {
-  vector<string> I(A.size()+B.size());
+  vector<string> I(A.size()+B.size());                                                    //armazena a interseccao entre os conjuntos - as listas
 
-  auto it = set_union(A.begin(), A.end(), B.begin(), B.end(), I.begin());
+  auto it = set_intersection(A.begin(), A.end(), B.begin(), B.end(), I.begin());          //calcula a interseccao entre os dois conjuntos
 
   I.resize(it- I.begin());
 
-  return I;
+  return I;                                                                               //retorna a resposta como uma lista de nos que sao a interseccao
 }
 
-void bronKerboschSemPivot(vector<string> R, vector<string> P, vector<string> X)
+void bronKerboschSemPivot(vector<string> R, vector<string> P, vector<string> X) //algoritmo de identificacao de cliques em um grafo nao direcionado e sem pesos
 {
-    vector<string> PCopy(P);
+    vector<string> PCopy(P);                                                                  //vetor copia de P utilizado para evitar perder o conteudo do vetor P ao longo da recursividade
 
     if(P.empty() && X.empty())
     {
-      cliques.push_back(R);
+      cliques.push_back(R);                                                                   // se nao existem mais nos a serem analisados, e nao ha como expandir o clique, adiciona o clique na resposta
+      return;
     }
 
-    for(auto v: P)
+    for(auto v: P)                                                                            // analisando cada no do grafo,
     {
+                                                                                              //busque recursivamente as ligacoes entre os nos do grafo, a fim de averiguar se todos os nos possuem adjacencia entre si
       bronKerboschSemPivot(uniao(R, {v}), interseccao(PCopy, grafo[find(grafo.begin(), grafo.end(), v)-grafo.begin()+1]), interseccao(X, grafo[find(grafo.begin(), grafo.end(), v)-grafo.begin()+1]));
 
-      PCopy.erase(find(PCopy.begin(), PCopy.end(), v));
-      X = uniao(X, {v});
+      PCopy.erase(find(PCopy.begin(), PCopy.end(), v));                                       //apague o no analisado na iteracao da lista de nos a serem analisados
+      X = uniao(X, {v});                                                                      // caracterize o conjunto de vertices analisados que nao extendem o clique como a uniao entre o conjunto e o vertice analisado na iteracao
     }
+
+    return; //talvez esse return aqui quebre meu codigo, mas talvez...
 }
 
 int main()
@@ -132,26 +147,27 @@ int main()
 
     bronKerboschSemPivot(R, P, X);                                                           //implementacao do algortimo de Bron-Kerbosch
 
-    int maior = -1;
+    int maior = -1; int ans=-1;
     for(int i=0; i<cliques.size(); i++)                                                     //apresentando os cliques maximais acima de 3 vertices
     {
       if(cliques[i].size()>3)
       {
         cout << "o clique maximal eh\n";
-        print(cliques[i]);
+        print(cliques[i]);                                                                   //imprimindo os cliques com tamanho maior que 3
 
         if(cliques[i].size()>maior)
         {
-          maior = i;                                                                       //encontrando o clique maximo
+          ans = i;
+          maior = cliques[i].size();                                                            //encontrando o clique maximo
         }
       }
     }
 
-    vector<string> maximo = cliques[maior];
+    vector<string> maximo = cliques[ans];                                                     //buscando na lista de cliques a posicao do maior clique
 
-    cout << "o clique maximo eh\n"; print(maximo);                                                                       //apresentando o clique maximo
-
-    printf("O coeficiente medio de aglomeracao eh %.2lf\n", coeficienteDeAglomeracao());         //apresentando o coeficiente medio de aglomeracao
+    cout << "o clique maximo eh\n"; print(maximo);                                              //apresentando o clique maximo
+    
+    cout << "O coeficiente medio de aglomeracao eh " << coeficienteDeAglomeracao() << endl;     //apresentando o coeficiente medio de aglomeracao 
 
     return 0;
 }
