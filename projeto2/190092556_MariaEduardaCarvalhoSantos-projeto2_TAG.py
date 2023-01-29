@@ -4,7 +4,7 @@ Nome: Maria Eduarda Carvalho Santos
 Matricula: 190092556
 UnB, Darcy Ribeiro - 2022.2
 -------------------------------------------------------------------------------------------------------------------------
-Para analisar o resultado do emprelhamento, é necessário utilizar
+Para analisar o resultado do emparelhamento, é necessário utilizar
 
 $ python3 190092556_MariaEduardaCarvalhoSantos-projeto2_TAG.py > output.txt
 
