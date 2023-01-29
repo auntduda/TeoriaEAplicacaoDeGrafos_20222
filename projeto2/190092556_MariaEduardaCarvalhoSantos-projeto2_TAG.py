@@ -13,8 +13,8 @@ como linha de comando no terminal, e então, abrir o arquivo "output.txt" para v
 
 def monta_grafo():
     
-    professores = {}                            # montando um dicionario de professores disponiveis a partir do input
-    escolas = {}                                # montando um dicionario de escolas disponiveis a partir do input
+    professores = {}        # montando um dicionario de professores disponiveis a partir do input
+    escolas = {}            # montando um dicionario de escolas disponiveis a partir do input
 
     # fazendo parse do arquivo cabuloso
 
@@ -39,75 +39,73 @@ def monta_grafo():
 
 
 def aloca(id_professor, professores_livres, escolas_livres):
-    """
-    A função é responsável por alocar um professor livre na escola dependendo das condições. Primeiro é verificado se o professor esta livre
-    e se a habilitação do professor é maior ou igual que a habilitação da escola na lista de preferências do professor (que é pecorrida pelo laço principal),
-    se for ele verifica se a escola já tem professor alocado, se não tiver ela aloca o professor na escola. O mesmo acontece para a segunda vaga. Se nenhuma
-    condição for satisfeita, a função retorna false.
-    """
+    
     for i in range(len(professores_livres[id_professor]['escolas_pref'])):
-        id_escola = professores_livres[id_professor]['escolas_pref'][i]
+        id_escola = professores_livres[id_professor]['escolas_pref'][i]                                                         # analisando todas as escolas que o professor tem preferencia em lecionar
         
+        # se o professor estiver livre, e a escola aceita a habilitacao dele,
         if (professores_livres[id_professor]['livre'] == True) and (professores_livres[id_professor]['habilitacao'] >= escolas_livres[id_escola]['habilitacao_pret'][0]) or ((professores_livres[id_professor]['habilitacao'] >= escolas_livres[id_escola]['habilitacao_pret'][1]) and (escolas_livres[id_escola]['habilitacao_pret'][1] != -1)):
+            # AND a primeira vaga ainda nao foi preenchida,
             if (escolas_livres[id_escola]['vagas_preenchidas'][0] == False) and (professores_livres[id_professor]['habilitacao'] >= escolas_livres[id_escola]['habilitacao_pret'][0]):
-                
+                # aloca-se o professor para aquela vaga
                 professores_livres[id_professor]['livre'] = False
                 professores_livres[id_professor]['local_trabalho'] = escolas_livres[id_escola]['id']
                 escolas_livres[id_escola]['vagas_preenchidas'][0] = True
                 escolas_livres[id_escola]['professores'][0] = professores_livres[id_professor]['id']
                 
+                # se a habilitacao do professor alocado for maior que a habilitacao solicitada pela escola,
                 if professores_livres[id_professor]['habilitacao'] > escolas_livres[id_escola]['habilitacao_pret'][0]:
-                    escolas_livres[id_escola]['margem'][0] = True
-                elif professores_livres[id_professor]['habilitacao'] == escolas_livres[id_escola]['habilitacao_pret'][0]:
-                    escolas_livres[id_escola]['margem'][0] = False
+                    escolas_livres[id_escola]['margem'][0] = True                                                               # nao ha margem para troca de professores,
+                elif professores_livres[id_professor]['habilitacao'] == escolas_livres[id_escola]['habilitacao_pret'][0]:       # se nao,
+                    escolas_livres[id_escola]['margem'][0] = False                                                              # aquele professor pode ser trocado em algum momento - para construir um emparelhamento mais estavel
                 
                 return True
-
+            
+            # AND a segunda vaga ainda nao foi preenchida, aloca-se o professor para aquela vaga
             if (escolas_livres[id_escola]['vagas_preenchidas'][1] == False) and ((professores_livres[id_professor]['habilitacao'] >= escolas_livres[id_escola]['habilitacao_pret'][1]) and (escolas_livres[id_escola]['habilitacao_pret'][1] != -1)):
                 professores_livres[id_professor]['livre'] = False
                 professores_livres[id_professor]['local_trabalho'] = escolas_livres[id_escola]['id']
                 escolas_livres[id_escola]['vagas_preenchidas'][1] = True
                 escolas_livres[id_escola]['professores'][1] = professores_livres[id_professor]['id']
                 
+                # se a habilitacao do professor alocado for maior que a habilitacao solicitada pela escola,
                 if professores_livres[id_professor]['habilitacao'] > escolas_livres[id_escola]['habilitacao_pret'][0]:
-                    escolas_livres[id_escola]['margem'][0] = True
-                elif professores_livres[id_professor]['habilitacao'] == escolas_livres[id_escola]['habilitacao_pret'][0]:
-                    escolas_livres[id_escola]['margem'][0] = False
+                    escolas_livres[id_escola]['margem'][0] = True                                                               # nao ha margem para troca de professores,
+                elif professores_livres[id_professor]['habilitacao'] == escolas_livres[id_escola]['habilitacao_pret'][0]:       # se nao,
+                    escolas_livres[id_escola]['margem'][0] = False                                                              # aquele professor pode ser trocado em algum momento - para construir um emparelhamento mais estavel
                 
-                return True
-    return False
+                return True                                                                                                     # e entao, foi possivel alocar o professor
+    return False                                                                                                                # caso as condicoes acima nao possam ser satisfeitas em algum momento, o professor nao pôde ser alocado em nenhuma escola
 
 
 def substitui(id_professor, professores_livres, escolas_livres):
-    """
-    A função é responsável por substituir um professor. Ela verifica se a habilitação do professor é maior ou igual a habilitação pretendida
-    da escola, se sim ele verifica se a escola tem margem, então ele faz a troca e retorna o professor antigo. Ela compara as duas vagas caso tenha
-    e a primeira condição foi falhada. Se as duas condições falharem retorna -1.
-    """
+
     antigo = None
     for i in range(len(professores_livres[id_professor]['escolas_pref'])):
         id_escola = professores_livres[id_professor]['escolas_pref'][i]
         
-        # se o professor possui uma habilitacao melhor ou igual à que a escola pede AND a escola tem uma habilitacao especifica,
+        # se o professor possui a primeira habilitacao melhor ou igual à que a escola pede AND a escola tem uma habilitacao especifica,
         if (professores_livres[id_professor]['habilitacao'] >= escolas_livres[id_escola]['habilitacao_pret'][0]) or ((professores_livres[id_professor]['habilitacao'] >= escolas_livres[id_escola]['habilitacao_pret'][1]) and (escolas_livres[id_escola]['habilitacao_pret'][1] != -1)):
             
             # AND o professor analisado nao esta alocado na escola analisada,
             if(professores_livres[id_professor]['habilitacao'] >= escolas_livres[id_escola]['habilitacao_pret'][0]) and (escolas_livres[id_escola]['margem'][0] == True) and (escolas_livres[id_escola]['professores'][0] != professores_livres[id_professor]['id']) and (escolas_livres[id_escola]['professores'][1] != professores_livres[id_professor]['id']):
-                professores_livres[id_professor]['livre'] = False
-                professores_livres[id_professor]['local_trabalho'] = escolas_livres[id_escola]['id']
-                escolas_livres[id_escola]['vagas_preenchidas'][0] = True
+                professores_livres[id_professor]['livre'] = False                                       # o professor nao esta mais livre para ser alocado
+                professores_livres[id_professor]['local_trabalho'] = escolas_livres[id_escola]['id']    # o novo local de trabalho dele é a escola atualmente analisada
+                escolas_livres[id_escola]['vagas_preenchidas'][0] = True                                # a vaga que pede aquela habilitacao especifica esta preenchida
                 
-                if professores_livres[id_professor]['habilitacao'] > escolas_livres[id_escola]['habilitacao_pret'][0]:
-                    escolas_livres[id_escola]['margem'][0] = True
-                elif professores_livres[id_professor]['habilitacao'] == escolas_livres[id_escola]['habilitacao_pret'][0]:
-                    escolas_livres[id_escola]['margem'][0] = False
+                if professores_livres[id_professor]['habilitacao'] > escolas_livres[id_escola]['habilitacao_pret'][0]:      # se o professor alocado tem uma habilitacao maior que a solicitada pela escola,
+                    escolas_livres[id_escola]['margem'][0] = True                                                           # ainda existe margem para troca
+                elif professores_livres[id_professor]['habilitacao'] == escolas_livres[id_escola]['habilitacao_pret'][0]:   # se nao,
+                    escolas_livres[id_escola]['margem'][0] = False                                                          # este sera o professor definitivo
                 
+                # alocando definitivamente o novo professor na escola, e retornando o professor desalocado para coloca-lo de volta na fila de professores que ainda precisam de escola
                 antigo = escolas_livres[id_escola]['professores'][0]
                 professores_livres[antigo]['livre'] = True
                 escolas_livres[id_escola]['professores'][0] = professores_livres[id_professor]['id']
                 
                 return antigo
 
+            # verificando se o professor a substituir outro se encaixa na segunda habilitacao - tal como feito acima
             if (professores_livres[id_professor]['habilitacao'] >= escolas_livres[id_escola]['habilitacao_pret'][1] and (escolas_livres[id_escola]['habilitacao_pret'][1] != -1)) and (escolas_livres[id_escola]['margem'][1] == True) and (escolas_livres[id_escola]['professores'][0] != professores_livres[id_professor]['id']) and (escolas_livres[id_escola]['professores'][1] != professores_livres[id_professor]['id']):
                 professores_livres[id_professor]['livre'] = False
                 professores_livres[id_professor]['local_trabalho'] = escolas_livres[id_escola]['id']
